@@ -18,12 +18,14 @@
 #include "valve.h"
 #include "sensor.h"
 
-
 class PlantWateringSystem
 {
 public:
     void init();
     void execute();
+    void startWatering();
+    void stopWatering();
+
 private:
     Pump pump_;
     Valve valve_;

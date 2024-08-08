@@ -23,5 +23,17 @@ void PlantWateringSystem::init()
 
 void PlantWateringSystem::execute()
 {
+}
 
+void PlantWateringSystem::startWatering()
+{
+    valve_.open();
+    delay(500);
+    pump_.enable();
+}
+
+void PlantWateringSystem::stopWatering()
+{
+    pump_.disable();
+    valve_.close();
 }

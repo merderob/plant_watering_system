@@ -16,7 +16,7 @@
 
 void Valve::init()
 {
-    relay_pin_ = Params::pump_relay_pin;
+    relay_pin_ = Params::valve_relay_pin;
     pinMode(relay_pin_, OUTPUT);
     digitalWrite(relay_pin_, LOW);
 }

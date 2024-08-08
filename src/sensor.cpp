@@ -17,5 +17,11 @@
 void Sensor::init()
 {
     sensor_pin_ = Params::sensor_pin;
+    min_sensor_value_ = Params::min_sensor_value;
     pinMode(sensor_pin_, INPUT);   
+}
+
+void Sensor::read()
+{
+    cur_sensor_value_ = analogRead(sensor_pin_);
 }

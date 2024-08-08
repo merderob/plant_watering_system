@@ -20,6 +20,9 @@ class Sensor: public Device
 {
 public:
     void init() override;
+    void read();
 private:
     uint8_t sensor_pin_ = 0;
+    uint16_t min_sensor_value_ = 0;
+    uint16_t cur_sensor_value_ = 0;
 };
