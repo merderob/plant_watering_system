@@ -20,6 +20,8 @@ struct Params
 {
     static const uint8_t pump_relay_pin = 15;
     static const uint8_t valve_relay_pin = 12;
-    static const uint8_t sensor_pin = 13;
+    static const uint8_t sensor_pin = 33;
     static const uint16_t min_sensor_value = 5000;
+    static const long ntp_offset = 0;
+    static const unsigned long ntp_interval_ms =  60 * 1000;
 };

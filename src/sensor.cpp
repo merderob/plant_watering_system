@@ -25,3 +25,9 @@ void Sensor::read()
 {
     cur_sensor_value_ = analogRead(sensor_pin_);
 }
+
+void Sensor::log()
+{
+    Serial.print("Sensor value: ");
+    Serial.println(cur_sensor_value_);
+}

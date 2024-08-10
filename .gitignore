@@ -7,3 +7,5 @@
 .vscode/
 
 credentials/credentials.h
+
+frontend/

@@ -17,6 +17,7 @@
 #include "pump.h"
 #include "valve.h"
 #include "sensor.h"
+#include "clock.h"
 
 class PlantWateringSystem
 {
@@ -30,4 +31,5 @@ private:
     Pump pump_;
     Valve valve_;
     Sensor sensor_;
+    Clock clock_;
 };

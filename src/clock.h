@@ -4,39 +4,33 @@
 // files (the “Software”), to deal in the Software without restriction, including without limitation the rights to use, copy,
 // modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software
 // is furnished to do so, subject to the following conditions:
-//
+// 
 // The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 //
-// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+// THE SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
 // WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "plant_watering_system.h"
+#pragma once
 
-void PlantWateringSystem::init()
-{
-    pump_.init();
-    valve_.init();
-    sensor_.init();
-    clock_.init();
-}
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+#include <memory>
+#include <Timezone.h>   // https://github.com/JChristensen/Timezone
 
-void PlantWateringSystem::execute()
-{
-    clock_.update();
-    sensor_.read();
-}
+#include "device.h"
 
-void PlantWateringSystem::startWatering()
+class Clock: public Device
 {
-    valve_.open();
-    delay(500);
-    pump_.enable();
-}
+public:
+    Clock();
+    void init();
+    void update();
+    void printDateTime() const;
 
-void PlantWateringSystem::stopWatering()
-{
-    pump_.disable();
-    valve_.close();
-}
+private:
+    WiFiUDP ntp_udp_;
+    std::unique_ptr<Timezone> time_zone_;
+    std::unique_ptr<NTPClient> time_client_ = nullptr;
+};

@@ -16,22 +16,59 @@
 #include <WiFi.h>
 #include "../credentials/credentials.h"
 #include "plant_watering_system.h"
+#include <ESPAsyncWebServer.h>
+#include "index.h"
 
 unsigned long exec_period_ms = 100; 
 unsigned long prev_exec_time_ms = 0;
 
 PlantWateringSystem system_;
+AsyncWebServer server(80);
 
-// iip: ...192.168.0.185
+// IP: ...192.168.0.185
+
+namespace frontend
+{
+    const char* water_param = "water";
+    const char* event_param = "event_time";
+}
+
+void notFound(AsyncWebServerRequest *request) 
+{
+    request->send(404, "text/plain", "Not found");
+}
 
 void setup()
 {
+    Serial.begin(9600);
     WiFi.begin(Credentials::ssid.c_str(), Credentials::password.c_str());
     while (WiFi.status() != WL_CONNECTED)
     {
         delay(500);
     }
     system_.init();
+
+    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
+    {
+        request->send(200, "text/html", index_html);
+    });
+
+    server.on("/get", HTTP_GET, [] (AsyncWebServerRequest *request) 
+    {
+        if (request->hasParam(frontend::water_param)) 
+        {
+            const auto command = request->getParam(frontend::water_param)->value();
+        }
+        else if (request->hasParam(frontend::event_param))
+        {
+            const auto command = request->getParam(frontend::event_param)->value();
+        }
+        request->send(200, "text/html", index_html);
+    });
+
+    server.onNotFound(notFound);
+
+    server.begin();
 }
 
 void loop()

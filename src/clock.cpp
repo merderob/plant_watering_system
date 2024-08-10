@@ -12,18 +12,34 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "clock.h"
 
-#include "device.h"
-
-class Sensor: public Device
+Clock::Clock()
 {
-public:
-    void init() override;
-    void read();
-    void log();
-private:
-    uint8_t sensor_pin_ = 0;
-    uint16_t min_sensor_value_ = 0;
-    uint16_t cur_sensor_value_ = 0;
-};
+    TimeChangeRule huDST = {"EDT", Second, Sun, Mar, 31, 120};  // Daylight time = UTC + 2 hrs
+    TimeChangeRule huSTD = {"EST", First, Sun, Oct, 27, 60};   // Standard time = UTC + 1 hr
+    time_zone_ = std::unique_ptr<Timezone>(new Timezone(huDST, huSTD));
+    time_client_ = std::unique_ptr<NTPClient>(new NTPClient(ntp_udp_, "hu.pool.ntp.org", Params::ntp_offset, Params::ntp_interval_ms));
+}
+
+void Clock::init()
+{
+    time_client_->begin();
+}
+
+void Clock::update()
+{
+    time_client_->update();
+}
+
+void Clock::printDateTime() const
+{
+    time_t now = time_client_->getEpochTime();
+    const auto t = time_zone_->toLocal(now);
+    char buf[32];
+    char m[4];    // temporary storage for month string (DateStrings.cpp uses shared buffer)
+    strcpy(m, monthShortStr(month(t)));
+    sprintf(buf, "%.2d:%.2d:%.2d %s %.2d %s %d",
+        hour(t), minute(t), second(t), dayShortStr(weekday(t)), day(t), m, year(t));
+    Serial.println(buf);
+}
