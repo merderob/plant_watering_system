@@ -16,27 +16,111 @@
 
 void PlantWateringSystem::init()
 {
+    max_watering_duration_s_ = Params::max_watering_duration_s;
+    valve_pump_delay_ms_ = Params::valve_pump_delay_ms;
+
     pump_.init();
     valve_.init();
     sensor_.init();
     clock_.init();
 }
 
+void PlantWateringSystem::executeStandby()
+{
+    if (!events_.empty())
+    {
+        int remove_index = -1;
+        for (size_t id = 0; id < events_.size(); id++)
+        {
+            if (events_[id].getStartTime() <= clock_.getTime())
+            {
+                const auto &event = events_[id];
+                active_event_ = std::unique_ptr<WateringEvent>(new WateringEvent(event.getStartTime(), event.getEndTime(), event.isValid()));
+                remove_index = id;
+                if (!startWatering())
+                {
+                    return;
+                }
+                break;
+            }
+        }
+        if (remove_index != -1)
+        {
+            events_.erase(events_.begin() + remove_index);
+        }
+    }
+}
+
+void PlantWateringSystem::executeWatering()
+{
+    if (watering_started_at_ + max_watering_duration_s_ <= clock_.getTime())
+    {
+        stopWatering();
+        return;
+    }
+
+    if (active_event_ == nullptr)
+    {
+        return;
+    }
+
+    if (active_event_->getEndTime() <= clock_.getTime())
+    {
+        active_event_ = nullptr;
+        stopWatering();
+    }
+}
+
 void PlantWateringSystem::execute()
 {
     clock_.update();
     sensor_.read();
+    switch (state_)
+    {
+    case State::STANDBY:
+        executeStandby();
+        break;
+    case State::WATERING:
+        executeWatering();
+        break;
+    }
 }
 
-void PlantWateringSystem::startWatering()
+bool PlantWateringSystem::startWatering()
 {
+    if (!sensor_.waterLevelOk())
+    {
+#ifdef DEBUG
+    Serial.print("Water level not ok, cannot start watering: ");
+    Serial.println(sensor_.getValue());
+#endif
+        return false;
+    }
     valve_.open();
-    delay(500);
+    delay(valve_pump_delay_ms_);
     pump_.enable();
+    state_ = State::WATERING;
+    watering_started_at_ = clock_.getTime();
+    return true;
 }
 
 void PlantWateringSystem::stopWatering()
 {
     pump_.disable();
     valve_.close();
+    state_ = State::STANDBY;
+}
+
+void PlantWateringSystem::addWateringEvent(WateringEvent event)
+{
+    if (event.isValid())
+    {
+        events_.push_back(event);
+    }
+#ifdef DEBUG
+    else
+    {
+        Serial.println("Invalid event received");
+    }
+#endif
 }

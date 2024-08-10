@@ -14,16 +14,19 @@
 
 #include <Arduino.h>
 #include <WiFi.h>
+#include <ESPAsyncWebServer.h>
+
 #include "../credentials/credentials.h"
 #include "plant_watering_system.h"
-#include <ESPAsyncWebServer.h>
 #include "index.h"
+#include "command_translator.h"
 
 unsigned long exec_period_ms = 100; 
 unsigned long prev_exec_time_ms = 0;
 
 PlantWateringSystem system_;
 AsyncWebServer server(80);
+CommandTranslator translator;
 
 // IP: ...192.168.0.185
 
@@ -40,7 +43,10 @@ void notFound(AsyncWebServerRequest *request)
 
 void setup()
 {
+#ifdef DEBUG
     Serial.begin(9600);
+#endif
+
     WiFi.begin(Credentials::ssid.c_str(), Credentials::password.c_str());
     while (WiFi.status() != WL_CONNECTED)
     {
@@ -58,10 +64,22 @@ void setup()
         if (request->hasParam(frontend::water_param)) 
         {
             const auto command = request->getParam(frontend::water_param)->value();
+            const auto event = translator.translateManualCommand(command);
+            if (event == WateringCommand::START)
+            {
+                system_.startWatering();
+            }
+            else
+            {
+                system_.stopWatering();
+            }
         }
         else if (request->hasParam(frontend::event_param))
         {
             const auto command = request->getParam(frontend::event_param)->value();
+            const auto event = translator.translateScheduleCommand(command);
+            system_.addWateringEvent(event);
+
         }
         request->send(200, "text/html", index_html);
     });

@@ -63,6 +63,11 @@ const char index_html[] PROGMEM = R"rawliteral(
             width: 200px;
         }
     </style>
+    <script>
+        function addEvent(form) {
+            form.action = "/get/?event_time=" + form.event_time;
+        }
+    </script>
 </head>
 
 
@@ -81,7 +86,7 @@ const char index_html[] PROGMEM = R"rawliteral(
     <p>Schedule Event</p>
     <br />
 
-    <form>
+    <form onsubmit="addEvent(this)">
         <input type="datetime-local" id="event_time" name="event_time">
         <input class="button lg" type="submit" value="Schedule">
     </form>

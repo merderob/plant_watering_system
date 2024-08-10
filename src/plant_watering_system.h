@@ -18,18 +18,40 @@
 #include "valve.h"
 #include "sensor.h"
 #include "clock.h"
+#include "command.h"
+
+#include <vector>
 
 class PlantWateringSystem
 {
 public:
+
+    enum class State
+    {
+        STANDBY,
+        WATERING
+    };
+
     void init();
     void execute();
-    void startWatering();
+    void addWateringEvent(WateringEvent event);
+    bool startWatering();
     void stopWatering();
 
 private:
+
+    void executeStandby();
+    void executeWatering();
+
     Pump pump_;
     Valve valve_;
     Sensor sensor_;
     Clock clock_;
+    State state_ = State::STANDBY;
+    std::vector<WateringEvent> events_;
+
+    std::unique_ptr<WateringEvent> active_event_ = nullptr;
+    uint32_t max_watering_duration_s_ = 0;
+    uint32_t valve_pump_delay_ms_ = 0;
+    time_t watering_started_at_ = 0;
 };

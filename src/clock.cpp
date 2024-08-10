@@ -32,6 +32,21 @@ void Clock::update()
     time_client_->update();
 }
 
+time_t Clock::getTime() const
+{
+    const auto now = time_client_->getEpochTime();
+    return time_zone_->toLocal(now);
+}
+
+#ifdef DEBUG
+
+void Clock::printLocalTimeVal() const
+{
+    const auto time = getTime();
+    Serial.print("Clock value: ");
+    Serial.println(time);
+}
+
 void Clock::printDateTime() const
 {
     time_t now = time_client_->getEpochTime();
@@ -43,3 +58,4 @@ void Clock::printDateTime() const
         hour(t), minute(t), second(t), dayShortStr(weekday(t)), day(t), m, year(t));
     Serial.println(buf);
 }
+#endif

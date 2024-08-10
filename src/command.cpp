@@ -12,30 +12,30 @@
 // COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
 // ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "command.h"
 
-#include <NTPClient.h>
-#include <WiFiUdp.h>
-#include <memory>
-#include <Timezone.h> // https://github.com/JChristensen/Timezone
-
-#include "device.h"
-
-class Clock : public Device
+WateringEvent::WateringEvent()
+    : start_(0), end_(0), valid_(false) 
 {
-public:
-    Clock();
-    void init();
-    void update();
-    time_t getTime() const;
-
-#ifdef DEBUG
-    void printLocalTimeVal() const;
-    void printDateTime() const;
-#endif
-
-private:
-    WiFiUDP ntp_udp_;
-    std::unique_ptr<Timezone> time_zone_;
-    std::unique_ptr<NTPClient> time_client_ = nullptr;
 };
+
+WateringEvent::WateringEvent(time_t start, time_t end, bool valid)
+        : start_(start), end_(end), valid_(valid) 
+{
+};
+
+
+time_t WateringEvent::getStartTime() const
+{
+    return start_;
+}
+
+time_t WateringEvent::getEndTime() const
+{
+    return end_;
+}
+
+bool WateringEvent::isValid() const
+{
+    return valid_;
+}

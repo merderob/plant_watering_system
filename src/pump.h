@@ -19,13 +19,6 @@
 class Pump : public Device
 {
 public:
-
-    enum class State
-    {
-        STANDBY,
-        WATERING
-    };
-
     void init() override;
     void enable();
     void disable();

@@ -14,28 +14,27 @@
 
 #pragma once
 
-#include <NTPClient.h>
-#include <WiFiUdp.h>
-#include <memory>
-#include <Timezone.h> // https://github.com/JChristensen/Timezone
+#include <TimeLib.h>
 
-#include "device.h"
+enum WateringCommand
+{
+    START,
+    STOP
+};
 
-class Clock : public Device
+class WateringEvent
 {
 public:
-    Clock();
-    void init();
-    void update();
-    time_t getTime() const;
+    WateringEvent();
+    WateringEvent(time_t start, time_t end, bool valid);
 
-#ifdef DEBUG
-    void printLocalTimeVal() const;
-    void printDateTime() const;
-#endif
+
+    time_t getStartTime() const;
+    time_t getEndTime() const;
+    bool isValid() const;
 
 private:
-    WiFiUDP ntp_udp_;
-    std::unique_ptr<Timezone> time_zone_;
-    std::unique_ptr<NTPClient> time_client_ = nullptr;
+    time_t start_ = 0;
+    time_t end_ = 0;
+    bool valid_ = false;
 };

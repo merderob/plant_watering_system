@@ -14,28 +14,16 @@
 
 #pragma once
 
-#include <NTPClient.h>
-#include <WiFiUdp.h>
-#include <memory>
-#include <Timezone.h> // https://github.com/JChristensen/Timezone
+#include <Arduino.h>
 
-#include "device.h"
+#include "command.h"
 
-class Clock : public Device
+class CommandTranslator
 {
+
 public:
-    Clock();
-    void init();
-    void update();
-    time_t getTime() const;
-
-#ifdef DEBUG
-    void printLocalTimeVal() const;
-    void printDateTime() const;
-#endif
-
+    WateringCommand translateManualCommand(const String &command);
+    WateringEvent translateScheduleCommand(const String &command);
 private:
-    WiFiUDP ntp_udp_;
-    std::unique_ptr<Timezone> time_zone_;
-    std::unique_ptr<NTPClient> time_client_ = nullptr;
+    bool checkScheduleCommand(const String& command);
 };
