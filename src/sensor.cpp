@@ -16,6 +16,7 @@
 
 void Sensor::init()
 {
+    enabled_ = Params::sensor_enabled;
     sensor_pin_ = Params::sensor_pin;
     min_sensor_value_ = Params::min_sensor_value;
     pinMode(sensor_pin_, INPUT);
@@ -33,6 +34,10 @@ bool Sensor::waterLevelOk() const
     Serial.println(cur_sensor_value_);
     return true;
 #endif
+    if (!enabled_)
+    {
+        return true;
+    }
     return cur_sensor_value_ > min_sensor_value_;
 }
 

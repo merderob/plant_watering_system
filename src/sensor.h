@@ -29,6 +29,7 @@ public:
 #endif
 
 private:
+    bool enabled_ = false;
     uint8_t sensor_pin_ = 0;
     uint16_t min_sensor_value_ = 0;
     uint16_t cur_sensor_value_ = 0;

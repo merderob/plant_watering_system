@@ -91,8 +91,8 @@ bool PlantWateringSystem::startWatering()
     if (!sensor_.waterLevelOk())
     {
 #ifdef DEBUG
-    Serial.print("Water level not ok, cannot start watering: ");
-    Serial.println(sensor_.getValue());
+        Serial.print("Water level not ok, cannot start watering: ");
+        Serial.println(sensor_.getValue());
 #endif
         return false;
     }
@@ -123,4 +123,14 @@ void PlantWateringSystem::addWateringEvent(WateringEvent event)
         Serial.println("Invalid event received");
     }
 #endif
+}
+
+std::vector<std::string> PlantWateringSystem::getEvents() const
+{
+    std::vector<std::string> ret;
+    for (const auto &event : events_)
+    {
+        ret.push_back(clock_.timeToString(event.getStartTime()));
+    }
+    return ret;
 }

@@ -64,8 +64,29 @@ const char index_html[] PROGMEM = R"rawliteral(
         }
     </style>
     <script>
+        document.addEventListener("DOMContentLoaded", getEvents);
+
         function addEvent(form) {
             form.action = "/get/?event_time=" + form.event_time;
+        }
+        function getEvents() {
+            fetch("/events")
+                .then(res => res.json())
+                .then(data => {
+                    if (data === null || data.length === 0)
+                    {
+                        document.getElementById("even").innerHTML = "No upcoming events."
+                        return;
+                    }
+                    
+                    data.forEach(function (d) {
+                        document.getElementById("even").innerHTML =  document.getElementById("even").innerHTML + "<div>" +  d  + "<div>";
+                    });
+                }
+                )
+                .catch(function (err) {
+                    console.log("Something went wrong!", err)
+                });
         }
     </script>
 </head>
@@ -90,6 +111,9 @@ const char index_html[] PROGMEM = R"rawliteral(
         <input type="datetime-local" id="event_time" name="event_time">
         <input class="button lg" type="submit" value="Schedule">
     </form>
+    <br />
+    <p>Upcoming Events</p>
+    <div id="even"></div>
 </body>
 
 </html>

@@ -28,6 +28,7 @@ public:
     void init();
     void update();
     time_t getTime() const;
+    std::string timeToString(time_t t) const;
 
 #ifdef DEBUG
     void printLocalTimeVal() const;

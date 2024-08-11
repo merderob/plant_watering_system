@@ -48,7 +48,7 @@ WateringEvent CommandTranslator::translateScheduleCommand(const String &command)
     tm.Month = mth.toInt();
     tm.Year = yr.toInt() - 1970;
     time_t start_time = makeTime(tm);
-    time_t end_time = start_time + 5; // 5s
+    time_t end_time = start_time + 60; // 60s
     return WateringEvent (start_time, end_time, true);
 }
 

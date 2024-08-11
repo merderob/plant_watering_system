@@ -15,6 +15,7 @@
 #include <Arduino.h>
 #include <WiFi.h>
 #include <ESPAsyncWebServer.h>
+#include <ArduinoJson.h>
 
 #include "../credentials/credentials.h"
 #include "plant_watering_system.h"
@@ -27,6 +28,8 @@ unsigned long prev_exec_time_ms = 0;
 PlantWateringSystem system_;
 AsyncWebServer server(80);
 CommandTranslator translator;
+
+JsonDocument events;
 
 // IP: ...192.168.0.185
 
@@ -52,6 +55,10 @@ void setup()
     {
         delay(500);
     }
+#ifdef DEBUG
+    Serial.println(WiFi.localIP());
+#endif
+
     system_.init();
 
     server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
@@ -82,6 +89,19 @@ void setup()
 
         }
         request->send(200, "text/html", index_html);
+    });
+
+    server.on("/events", HTTP_GET, [](AsyncWebServerRequest* request)
+    {
+        const auto& events_vec = system_.getEvents();
+        for (const auto& event: events_vec)
+        {
+            events.add(event);
+        }
+        String response;
+        serializeJson(events, response);
+        request->send(200, "application/json", response);
+        events.clear();
     });
 
     server.onNotFound(notFound);

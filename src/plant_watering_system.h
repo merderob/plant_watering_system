@@ -37,6 +37,7 @@ public:
     void addWateringEvent(WateringEvent event);
     bool startWatering();
     void stopWatering();
+    std::vector<std::string> getEvents() const;
 
 private:
 
