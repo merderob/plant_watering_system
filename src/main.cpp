@@ -104,6 +104,12 @@ void setup()
         events.clear();
     });
 
+    server.on("/time", HTTP_GET, [](AsyncWebServerRequest* request)
+    {
+        const auto& time = system_.getTime();
+        request->send(200, "text/plain", time.c_str());
+    });
+
     server.onNotFound(notFound);
 
     server.begin();

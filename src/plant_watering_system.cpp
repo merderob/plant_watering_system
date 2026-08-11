@@ -27,27 +27,29 @@ void PlantWateringSystem::init()
 
 void PlantWateringSystem::executeStandby()
 {
-    if (!events_.empty())
+    if (events_.empty())
     {
-        int remove_index = -1;
-        for (size_t id = 0; id < events_.size(); id++)
+        return;
+    }
+
+    int event_idx_to_remove = -1;
+    for (size_t id = 0; id < events_.size(); id++)
+    {
+        if (events_[id].getStartTime() <= clock_.getTime())
         {
-            if (events_[id].getStartTime() <= clock_.getTime())
+            const auto &event = events_[id];
+            active_event_ = std::unique_ptr<WateringEvent>(new WateringEvent(event.getStartTime(), event.getEndTime(), event.isValid()));
+            event_idx_to_remove = id;
+            if (!startWatering())
             {
-                const auto &event = events_[id];
-                active_event_ = std::unique_ptr<WateringEvent>(new WateringEvent(event.getStartTime(), event.getEndTime(), event.isValid()));
-                remove_index = id;
-                if (!startWatering())
-                {
-                    return;
-                }
-                break;
+                return;
             }
+            break;
         }
-        if (remove_index != -1)
-        {
-            events_.erase(events_.begin() + remove_index);
-        }
+    }
+    if (event_idx_to_remove != -1)
+    {
+        events_.erase(events_.begin() + event_idx_to_remove);
     }
 }
 
@@ -133,4 +135,9 @@ std::vector<std::string> PlantWateringSystem::getEvents() const
         ret.push_back(clock_.timeToString(event.getStartTime()));
     }
     return ret;
+}
+
+std::string PlantWateringSystem::getTime() const 
+{
+    return clock_.timeToString(clock_.getTime());
 }

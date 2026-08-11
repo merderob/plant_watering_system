@@ -38,6 +38,7 @@ public:
     bool startWatering();
     void stopWatering();
     std::vector<std::string> getEvents() const;
+    std::string getTime() const;
 
 private:
 

@@ -88,6 +88,20 @@ const char index_html[] PROGMEM = R"rawliteral(
                     console.log("Something went wrong!", err)
                 });
         }
+
+        async function updateClock() {
+        try {
+            const response = await fetch('/time');
+            document.getElementById('clock').textContent =
+            await response.text();
+        } catch (e) {
+            console.log(e);
+        }
+        }
+
+        updateClock();
+        setInterval(updateClock, 1000);
+
     </script>
 </head>
 
@@ -114,6 +128,8 @@ const char index_html[] PROGMEM = R"rawliteral(
     <br />
     <p>Upcoming Events</p>
     <div id="even"></div>
+    <p>Current time</p>
+    <span id="clock">--:--:--</span>
 </body>
 
 </html>

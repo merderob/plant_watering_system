@@ -16,7 +16,7 @@
 
 #include <stdint.h>
 
-// #define DEBUG
+#define DEBUG
 
 struct Params
 {
@@ -37,5 +37,5 @@ struct Params
     /// @brief The delay to enable the pump after opening the valve.
     static const uint32_t valve_pump_delay_ms = 500;
     /// @brief The maximum watering duration.
-    static const uint32_t max_watering_duration_s = 60;
+    static const uint32_t max_watering_duration_s = 60; // TODO update
 };
